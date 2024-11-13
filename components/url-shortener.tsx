@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Table, TableHead, TableRow, TableBody, TableCell, TableHeader } from "./ui/table";
+import ClickToCopy from "./click-to-copy";
 
 interface UrlEntry {
   id: string;
@@ -17,7 +18,6 @@ const UrlShortener: React.FC = () => {
   const [shortUrl, setShortUrl] = useState<string>("");
   const [urlList, setUrlList] = useState<UrlEntry[]>([]);
 
-  // Tüm URL'leri çekmek için useEffect kancası
   useEffect(() => {
     const fetchUrls = async () => {
       const response = await fetch("/api/shorten", {
@@ -39,7 +39,6 @@ const UrlShortener: React.FC = () => {
     fetchUrls();
   }, []);
 
-  // Yeni URL kısaltma işlemi
   const shortenUrl = async () => {
     const response = await fetch("/api/shorten", {
       method: "POST",
@@ -64,7 +63,7 @@ const UrlShortener: React.FC = () => {
 
   return (
     <div>
-      <div className="flex items-center gap-5">
+      <div className="flex justify-center items-center gap-3">
         <Input
           type="text"
           placeholder="Enter your link here"
@@ -73,44 +72,41 @@ const UrlShortener: React.FC = () => {
           className="w-96 bg-white"
         />
         <Button onClick={shortenUrl} className="ml-2">
-          Shorten
+          Shorten Link
         </Button>
       </div>
-      {shortUrl && (
-        <div className="mt-2">
-          Shortened URL:{" "}
-          <a href={shortUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500">
-            {shortUrl}
-          </a>
-        </div>
-      )}
       {urlList.length > 0 && (
-        <Table className="mt-5 bg-white bg-opacity-20 rounded-lg">
-          <TableHeader>
-            <TableRow>
-              <TableHead key="original-url-head" className="text-black">Original URL</TableHead>
-              <TableHead key="short-url-head" className="text-black">Shortened URL</TableHead>
-              <TableHead key="date-head" className="text-black">Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {urlList.map((entry) => (
-              <TableRow key={entry.id}>
-                <TableCell key={`${entry.id}-original`}>
-                  <a href={entry.originalUrl} target="_blank" rel="noopener noreferrer">
-                    {entry.originalUrl}
-                  </a>
-                </TableCell>
-                <TableCell key={`${entry.id}-short`}>
-                  <a href={entry.shortUrl} target="_blank" rel="noopener noreferrer">
-                    {entry.shortUrl}
-                  </a>
-                </TableCell>
-                <TableCell key={`${entry.id}-date`}>{entry.date.toLocaleString()}</TableCell>
+        <div className="mt-5 max-h-[350px] overflow-y-auto no-scrollbar bg-white rounded-lg border border-gray-300">
+          <Table className="border border-gray-300">
+            <TableHeader>
+              <TableRow className="border-b border-gray-300">
+                <TableHead key="original-url-head" className="text-black text-center border-r border-gray-300">
+                  Original URL
+                </TableHead>
+                <TableHead key="short-url-head" className="text-black text-center">
+                  Shortened URL
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {urlList.map((entry) => (
+                <TableRow key={entry.id} className="border-b border-gray-300">
+                  <TableCell
+                    key={`${entry.id}-original`}
+                    className="max-w-[250px] overflow-hidden whitespace-nowrap text-ellipsis border-r border-gray-300"
+                  >
+                    <a href={entry.originalUrl} target="_blank" rel="noopener noreferrer">
+                      {entry.originalUrl}
+                    </a>
+                  </TableCell>
+                  <TableCell key={`${entry.id}-short`}>
+                    <ClickToCopy text={entry.shortUrl} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );
