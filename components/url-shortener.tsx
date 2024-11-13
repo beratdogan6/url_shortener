@@ -13,10 +13,17 @@ interface UrlEntry {
   date: Date;
 }
 
+interface ApiUrlEntry {
+  id: string;
+  url: string;
+}
+
 const UrlShortener: React.FC = () => {
   const [url, setUrl] = useState<string>("");
   const [shortUrl, setShortUrl] = useState<string>("");
   const [urlList, setUrlList] = useState<UrlEntry[]>([]);
+
+  console.log(shortUrl);
 
   useEffect(() => {
     const fetchUrls = async () => {
@@ -26,11 +33,10 @@ const UrlShortener: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        const fetchedUrls = data.urls.map((entry: any) => ({
+        const fetchedUrls = data.urls.map((entry: ApiUrlEntry) => ({
           id: entry.id,
           originalUrl: entry.url,
           shortUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/${entry.id}`,
-          date: new Date(entry.date),
         }));
         setUrlList(fetchedUrls);
       }
