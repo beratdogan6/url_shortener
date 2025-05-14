@@ -9,13 +9,7 @@ const UrlSchema = new Schema({
 
 const Url = models.Url || model("Url", UrlSchema);
 
-type PageProps = {
-  params: {
-    id: string;
-  };
-};
-
-export default async function RedirectPage({ params }: PageProps) {
+export default async function RedirectPage({ params }: { params: { id: string } }) {
   await connectDB();
 
   const result = await Url.findOne({ id: params.id });
